@@ -8,20 +8,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Shield, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const { signIn, user, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,7 +37,7 @@ export default function AdminLogin() {
     setErrors({});
 
     // Validate
-    const result = loginSchema.safeParse({ email, password });
+    const result = loginSchema.safeParse({ username, password });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
@@ -51,28 +52,31 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
+      // Call edge function for username-based login
+      const { data, error } = await supabase.functions.invoke("admin-login", {
+        body: { username, password },
+      });
       
-      if (error) {
-        if (error.message.includes("Invalid login credentials")) {
-          toast({
-            title: "Login Failed",
-            description: "Invalid email or password. Please try again.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Login Failed",
-            description: error.message,
-            variant: "destructive",
-          });
-        }
+      if (error || data?.error) {
+        toast({
+          title: "Login Failed",
+          description: data?.error || error?.message || "Invalid username or password",
+          variant: "destructive",
+        });
         return;
+      }
+
+      // Set the session from the edge function response
+      if (data?.session) {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
       }
 
       toast({
         title: "Login Successful",
-        description: "Welcome back!",
+        description: "Welcome back, Admin!",
       });
       
       navigate("/admin/dashboard");
@@ -106,18 +110,18 @@ export default function AdminLogin() {
           <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@example.com"
-                  className={errors.email ? "border-destructive" : ""}
-                  autoComplete="email"
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your username"
+                  className={errors.username ? "border-destructive" : ""}
+                  autoComplete="username"
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
+                {errors.username && (
+                  <p className="text-sm text-destructive">{errors.username}</p>
                 )}
               </div>
 
