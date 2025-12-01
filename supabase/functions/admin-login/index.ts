@@ -21,10 +21,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create admin client with service role
+    // Create admin client with service role for lookups
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Create anon client for authentication (returns proper tokens)
+    const supabaseAnon = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? ""
     );
 
     // Look up user by username in profiles table
@@ -35,6 +41,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (profileError || !profile) {
+      console.log("Profile lookup failed:", profileError);
       return new Response(
         JSON.stringify({ error: "Invalid username or password" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -47,6 +54,7 @@ Deno.serve(async (req) => {
     );
 
     if (userError || !userData?.user?.email) {
+      console.log("User lookup failed:", userError);
       return new Response(
         JSON.stringify({ error: "Invalid username or password" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -62,25 +70,29 @@ Deno.serve(async (req) => {
       .single();
 
     if (!roleData) {
+      console.log("User is not an admin");
       return new Response(
         JSON.stringify({ error: "Access denied. Admin privileges required." }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Attempt to sign in with the found email
-    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+    // Attempt to sign in with the anon client (returns proper JWT tokens)
+    const { data: authData, error: authError } = await supabaseAnon.auth.signInWithPassword({
       email: userData.user.email,
       password,
     });
 
     if (authError) {
+      console.log("Auth failed:", authError);
       return new Response(
         JSON.stringify({ error: "Invalid username or password" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    console.log("Login successful for:", username);
+    
     return new Response(
       JSON.stringify({
         session: authData.session,
