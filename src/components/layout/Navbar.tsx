@@ -17,30 +17,31 @@ export function Navbar() {
   const location = useLocation();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-xl group-hover:shadow-primary/30 group-hover:scale-105 transition-all duration-300">
               <FileText className="w-5 h-5 text-primary-foreground" />
+              <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="font-display text-xl font-bold text-foreground">
-              MJ<span className="text-primary">DOCS</span>
+            <span className="font-display text-2xl font-bold text-foreground tracking-tight">
+              MJ<span className="text-gradient-orange">DOCS</span>
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 bg-muted/50 rounded-full p-1.5 backdrop-blur-sm border border-border/50">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200",
+                  "px-4 py-2 rounded-full font-medium text-sm transition-all duration-300",
                   location.pathname === link.path
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/80"
                 )}
               >
                 {link.name}
@@ -51,7 +52,7 @@ export function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link to="/admin/login">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
                 <LogIn className="w-4 h-4" />
                 Admin Login
               </Button>
@@ -61,33 +62,39 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className={cn(
+              "md:hidden p-2.5 rounded-xl transition-all duration-300",
+              isOpen 
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
+                : "bg-muted hover:bg-muted/80"
+            )}
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-slide-up">
+          <div className="md:hidden py-4 border-t border-border/50 animate-slide-up">
             <div className="flex flex-col gap-2">
-              {navLinks.map((link) => (
+              {navLinks.map((link, index) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
+                  style={{ animationDelay: `${index * 50}ms` }}
                   className={cn(
-                    "px-4 py-3 rounded-lg font-medium transition-all duration-200",
+                    "px-4 py-3 rounded-xl font-medium transition-all duration-300 animate-fade-in opacity-0",
                     location.pathname === link.path
-                      ? "bg-accent text-accent-foreground"
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   {link.name}
                 </Link>
               ))}
-              <Link to="/admin/login" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" className="w-full mt-2">
+              <Link to="/admin/login" onClick={() => setIsOpen(false)} className="mt-2">
+                <Button variant="outline" className="w-full rounded-xl border-2 shadow-md">
                   <LogIn className="w-4 h-4" />
                   Admin Login
                 </Button>
