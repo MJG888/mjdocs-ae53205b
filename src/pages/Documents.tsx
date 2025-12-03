@@ -111,11 +111,22 @@ export default function Documents() {
     if (!doc) return;
 
     try {
-      // Increment download count
-      await supabase
-        .from("documents")
-        .update({ download_count: doc.download_count + 1 })
-        .eq("id", id);
+      // Increment download count via edge function (bypasses RLS)
+      const { data: result } = await supabase.functions.invoke("increment-download", {
+        body: { documentId: id },
+      });
+
+      // Save to localStorage for Downloads page
+      const DOWNLOADS_KEY = "mjdocs_downloads";
+      const stored = localStorage.getItem(DOWNLOADS_KEY);
+      const history = stored ? JSON.parse(stored) : [];
+      const existingIndex = history.findIndex((r: { documentId: string }) => r.documentId === id);
+      if (existingIndex >= 0) {
+        history[existingIndex].downloadedAt = new Date().toISOString();
+      } else {
+        history.unshift({ documentId: id, downloadedAt: new Date().toISOString() });
+      }
+      localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(history));
 
       // Get download URL
       const { data } = supabase.storage
@@ -125,10 +136,11 @@ export default function Documents() {
       // Open download in new tab
       window.open(data.publicUrl, "_blank");
 
-      // Update local state
+      // Update local state with new count
+      const newCount = result?.newCount || doc.download_count + 1;
       setDocuments((prev) =>
         prev.map((d) =>
-          d.id === id ? { ...d, download_count: d.download_count + 1 } : d
+          d.id === id ? { ...d, download_count: newCount } : d
         )
       );
 
