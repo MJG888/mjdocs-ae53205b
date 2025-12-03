@@ -153,7 +153,7 @@ export default function Downloads() {
               Your <span className="text-primary">Downloaded</span> Documents
             </h1>
             <p className="text-muted-foreground">
-              View and re-download documents you've previously downloaded.
+              View documents instantly without downloading again, or re-download when needed.
             </p>
           </div>
         </div>
@@ -193,9 +193,14 @@ export default function Downloads() {
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {documents.length} downloaded document{documents.length !== 1 ? "s" : ""}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    {documents.length} downloaded document{documents.length !== 1 ? "s" : ""}
+                  </p>
+                  <p className="text-xs text-muted-foreground bg-accent px-3 py-1 rounded-full">
+                    Click "View" to open instantly
+                  </p>
+                </div>
                 <div className="grid gap-4">
                   {documents.map((doc) => (
                     <DocumentCard
@@ -212,6 +217,8 @@ export default function Downloads() {
                       createdAt={getDownloadDate(doc.id) || doc.created_at}
                       onDownload={handleDownload}
                       onView={handleView}
+                      viewPrimary={true}
+                      showActionsAlways={true}
                     />
                   ))}
                 </div>
