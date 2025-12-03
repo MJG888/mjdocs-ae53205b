@@ -1,4 +1,4 @@
-import { FileText, Download, Calendar, HardDrive, Tag } from "lucide-react";
+import { FileText, Download, Calendar, HardDrive, Tag, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
@@ -16,6 +16,8 @@ interface DocumentCardProps {
   createdAt: string;
   onDownload: (id: string) => void;
   onView: (id: string) => void;
+  viewPrimary?: boolean;
+  showActionsAlways?: boolean;
 }
 
 function formatFileSize(bytes: number): string {
@@ -51,6 +53,8 @@ export function DocumentCard({
   createdAt,
   onDownload,
   onView,
+  viewPrimary = false,
+  showActionsAlways = false,
 }: DocumentCardProps) {
   return (
     <div className="bg-card border border-border rounded-xl p-5 card-hover group">
@@ -106,13 +110,27 @@ export function DocumentCard({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button size="sm" onClick={() => onDownload(id)}>
-            <Download className="w-4 h-4" />
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => onView(id)}>
-            <FileText className="w-4 h-4" />
-          </Button>
+        <div className={`flex flex-col gap-2 transition-opacity ${showActionsAlways ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+          {viewPrimary ? (
+            <>
+              <Button size="sm" onClick={() => onView(id)}>
+                <Eye className="w-4 h-4" />
+                View
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => onDownload(id)}>
+                <Download className="w-4 h-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button size="sm" onClick={() => onDownload(id)}>
+                <Download className="w-4 h-4" />
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => onView(id)}>
+                <Eye className="w-4 h-4" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
