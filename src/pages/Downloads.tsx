@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { DocumentCard } from "@/components/documents/DocumentCard";
+import { DocumentViewer } from "@/components/documents/DocumentViewer";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, Loader2, FolderOpen, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +31,7 @@ const DOWNLOADS_KEY = "mjdocs_downloads";
 export default function Downloads() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -123,12 +125,12 @@ export default function Downloads() {
   const handleView = (id: string) => {
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
+    setViewingDoc(doc);
+  };
 
-    const { data } = supabase.storage
-      .from("documents")
-      .getPublicUrl(doc.file_path);
-
-    window.open(data.publicUrl, "_blank");
+  const getFileUrl = (filePath: string) => {
+    const { data } = supabase.storage.from("documents").getPublicUrl(filePath);
+    return data.publicUrl;
   };
 
   const getDownloadDate = (id: string): string | undefined => {
@@ -227,6 +229,19 @@ export default function Downloads() {
           </div>
         </div>
       </section>
+
+      {/* Document Viewer Modal */}
+      {viewingDoc && (
+        <DocumentViewer
+          isOpen={!!viewingDoc}
+          onClose={() => setViewingDoc(null)}
+          title={viewingDoc.title}
+          fileUrl={getFileUrl(viewingDoc.file_path)}
+          fileType={viewingDoc.file_type || undefined}
+          fileName={viewingDoc.file_name}
+          onDownload={() => handleDownload(viewingDoc.id)}
+        />
+      )}
     </Layout>
   );
 }
