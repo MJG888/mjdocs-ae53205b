@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { DocumentCard } from "@/components/documents/DocumentCard";
+import { DocumentViewer } from "@/components/documents/DocumentViewer";
 import { SearchFilter } from "@/components/documents/SearchFilter";
 import { supabase } from "@/integrations/supabase/client";
 import { FileText, Loader2, FolderOpen } from "lucide-react";
@@ -26,6 +27,7 @@ export default function Documents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -161,12 +163,12 @@ export default function Documents() {
   const handleView = (id: string) => {
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
+    setViewingDoc(doc);
+  };
 
-    const { data } = supabase.storage
-      .from("documents")
-      .getPublicUrl(doc.file_path);
-
-    window.open(data.publicUrl, "_blank");
+  const getFileUrl = (filePath: string) => {
+    const { data } = supabase.storage.from("documents").getPublicUrl(filePath);
+    return data.publicUrl;
   };
 
   return (
@@ -250,6 +252,19 @@ export default function Documents() {
           </div>
         </div>
       </section>
+
+      {/* Document Viewer Modal */}
+      {viewingDoc && (
+        <DocumentViewer
+          isOpen={!!viewingDoc}
+          onClose={() => setViewingDoc(null)}
+          title={viewingDoc.title}
+          fileUrl={getFileUrl(viewingDoc.file_path)}
+          fileType={viewingDoc.file_type || undefined}
+          fileName={viewingDoc.file_name}
+          onDownload={() => handleDownload(viewingDoc.id)}
+        />
+      )}
     </Layout>
   );
 }
