@@ -10,6 +10,9 @@ import Documents from "./pages/Documents";
 import Downloads from "./pages/Downloads";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
+import Auth from "./pages/Auth";
+import Favorites from "./pages/Favorites";
+import RequestDocument from "./pages/RequestDocument";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -30,6 +33,9 @@ const App = () => (
             <Route path="/downloads" element={<Downloads />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/request-document" element={<RequestDocument />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="*" element={<NotFound />} />

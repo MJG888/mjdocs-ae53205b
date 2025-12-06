@@ -1,9 +1,9 @@
-import { FileText, Download, Calendar, HardDrive, Tag, Eye } from "lucide-react";
+import { FileText, Download, Calendar, HardDrive, Tag, Eye, Heart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 
-interface DocumentCardProps {
+export interface DocumentCardProps {
   id: string;
   title: string;
   description?: string;
@@ -18,6 +18,10 @@ interface DocumentCardProps {
   onView: (id: string) => void;
   viewPrimary?: boolean;
   showActionsAlways?: boolean;
+  // Favorite functionality
+  isFavorite?: boolean;
+  onToggleFavorite?: (id: string) => void;
+  onRemoveFavorite?: (id: string) => void;
 }
 
 function formatFileSize(bytes: number): string {
@@ -55,6 +59,9 @@ export function DocumentCard({
   onView,
   viewPrimary = false,
   showActionsAlways = false,
+  isFavorite = false,
+  onToggleFavorite,
+  onRemoveFavorite,
 }: DocumentCardProps) {
   return (
     <div className="bg-card border border-border rounded-xl p-5 card-hover group">
@@ -111,6 +118,29 @@ export function DocumentCard({
 
         {/* Actions */}
         <div className={`flex flex-col gap-2 transition-opacity ${showActionsAlways ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+          {/* Favorite/Remove button */}
+          {onRemoveFavorite ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => onRemoveFavorite(id)}
+              title="Remove from favorites"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          ) : onToggleFavorite && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className={isFavorite ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-red-500"}
+              onClick={() => onToggleFavorite(id)}
+              title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
+            </Button>
+          )}
+          
           {viewPrimary ? (
             <>
               <Button size="sm" onClick={() => onView(id)}>
