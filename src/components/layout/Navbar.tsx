@@ -1,8 +1,16 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, FileText, LogIn } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, FileText, LogIn, User, LogOut, Heart, FileQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -15,6 +23,13 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
@@ -51,12 +66,60 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/admin/login">
-              <Button variant="outline" size="sm" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
-                <LogIn className="w-4 h-4" />
-                Admin Login
-              </Button>
-            </Link>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
+                    <User className="w-4 h-4" />
+                    Account
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/favorites" className="flex items-center gap-2 cursor-pointer">
+                      <Heart className="w-4 h-4" />
+                      My Favorites
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/request-document" className="flex items-center gap-2 cursor-pointer">
+                      <FileQuestion className="w-4 h-4" />
+                      Request Document
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/dashboard" className="flex items-center gap-2 cursor-pointer text-primary">
+                          <FileText className="w-4 h-4" />
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="outline" size="sm" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
+                    <LogIn className="w-4 h-4" />
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/admin/login">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
+                    Admin
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}

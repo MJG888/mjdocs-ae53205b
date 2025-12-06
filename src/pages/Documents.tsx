@@ -4,6 +4,7 @@ import { DocumentCard } from "@/components/documents/DocumentCard";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
 import { SearchFilter } from "@/components/documents/SearchFilter";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { FileText, Loader2, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,11 +29,35 @@ export default function Documents() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     fetchDocuments();
   }, []);
+
+  // Fetch user favorites
+  useEffect(() => {
+    if (user) {
+      fetchFavorites();
+    } else {
+      setFavorites(new Set());
+    }
+  }, [user]);
+
+  const fetchFavorites = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from("user_favorites")
+      .select("document_id")
+      .eq("user_id", user.id);
+    
+    if (data) {
+      setFavorites(new Set(data.map((f) => f.document_id)));
+    }
+  };
 
   const fetchDocuments = async () => {
     try {
@@ -166,6 +191,47 @@ export default function Documents() {
     setViewingDoc(doc);
   };
 
+  const handleToggleFavorite = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to save favorites.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const isFav = favorites.has(id);
+    
+    if (isFav) {
+      // Remove from favorites
+      const { error } = await supabase
+        .from("user_favorites")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("document_id", id);
+
+      if (!error) {
+        setFavorites((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(id);
+          return newSet;
+        });
+        toast({ title: "Removed from favorites" });
+      }
+    } else {
+      // Add to favorites
+      const { error } = await supabase
+        .from("user_favorites")
+        .insert({ user_id: user.id, document_id: id });
+
+      if (!error) {
+        setFavorites((prev) => new Set(prev).add(id));
+        toast({ title: "Added to favorites" });
+      }
+    }
+  };
+
   const getFileUrl = (filePath: string) => {
     const { data } = supabase.storage.from("documents").getPublicUrl(filePath);
     return data.publicUrl;
@@ -244,6 +310,8 @@ export default function Documents() {
                       createdAt={doc.created_at}
                       onDownload={handleDownload}
                       onView={handleView}
+                      isFavorite={favorites.has(doc.id)}
+                      onToggleFavorite={user ? handleToggleFavorite : undefined}
                     />
                   ))}
                 </div>
