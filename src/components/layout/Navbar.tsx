@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, FileText, LogIn, User, LogOut, Heart, FileQuestion } from "lucide-react";
+import { Menu, X, FileText, LogIn, User, LogOut, Heart, FileQuestion, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -107,6 +107,12 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <>
+                <Link to="/auth?mode=signup">
+                  <Button variant="hero" size="sm" className="rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                    <UserPlus className="w-4 h-4" />
+                    Sign Up
+                  </Button>
+                </Link>
                 <Link to="/auth">
                   <Button variant="outline" size="sm" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
                     <LogIn className="w-4 h-4" />
@@ -156,12 +162,46 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <Link to="/admin/login" onClick={() => setIsOpen(false)} className="mt-2">
-                <Button variant="outline" className="w-full rounded-xl border-2 shadow-md">
-                  <LogIn className="w-4 h-4" />
-                  Admin Login
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/favorites" onClick={() => setIsOpen(false)} className="mt-2">
+                    <Button variant="outline" className="w-full rounded-xl border-2 shadow-md">
+                      <Heart className="w-4 h-4" />
+                      My Favorites
+                    </Button>
+                  </Link>
+                  <Link to="/request-document" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full rounded-xl border-2 shadow-md">
+                      <FileQuestion className="w-4 h-4" />
+                      Request Document
+                    </Button>
+                  </Link>
+                  <Button variant="destructive" className="w-full rounded-xl" onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/auth?mode=signup" onClick={() => setIsOpen(false)} className="mt-2">
+                    <Button variant="hero" className="w-full rounded-xl shadow-md">
+                      <UserPlus className="w-4 h-4" />
+                      Sign Up
+                    </Button>
+                  </Link>
+                  <Link to="/auth" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full rounded-xl border-2 shadow-md">
+                      <LogIn className="w-4 h-4" />
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/admin/login" onClick={() => setIsOpen(false)}>
+                    <Button variant="ghost" className="w-full rounded-xl text-muted-foreground">
+                      Admin Login
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
