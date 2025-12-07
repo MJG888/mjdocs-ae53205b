@@ -351,22 +351,27 @@ export default function AdminDashboard() {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link to="/admin/statistics">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="gap-2">
                 <BarChart3 className="w-4 h-4" />
-                Statistics
+                <span className="hidden sm:inline">Statistics</span>
               </Button>
             </Link>
             <Link to="/admin/requests">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="gap-2">
                 <FileQuestion className="w-4 h-4" />
-                Requests
+                <span className="hidden sm:inline">Requests</span>
               </Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={handleLogout}
+              className="gap-2 bg-primary hover:bg-primary/90"
+            >
               <LogOut className="w-4 h-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
