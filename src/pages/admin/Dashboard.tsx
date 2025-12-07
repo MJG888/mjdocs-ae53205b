@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,8 @@ import {
   FolderOpen,
   LayoutDashboard,
   History,
+  BarChart3,
+  FileQuestion,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -349,10 +351,24 @@ export default function AdminDashboard() {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link to="/admin/statistics">
+              <Button variant="outline" size="sm">
+                <BarChart3 className="w-4 h-4" />
+                Statistics
+              </Button>
+            </Link>
+            <Link to="/admin/requests">
+              <Button variant="outline" size="sm">
+                <FileQuestion className="w-4 h-4" />
+                Requests
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 

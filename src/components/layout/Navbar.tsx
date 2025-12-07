@@ -99,7 +99,7 @@ export function Navbar() {
                     </>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                  <DropdownMenuItem onClick={handleSignOut} className="text-primary cursor-pointer">
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </DropdownMenuItem>
@@ -176,7 +176,11 @@ export function Navbar() {
                       Request Document
                     </Button>
                   </Link>
-                  <Button variant="destructive" className="w-full rounded-xl" onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full rounded-xl border-primary text-primary hover:bg-primary hover:text-primary-foreground" 
+                    onClick={() => { handleSignOut(); setIsOpen(false); }}
+                  >
                     <LogOut className="w-4 h-4" />
                     Sign Out
                   </Button>
