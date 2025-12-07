@@ -15,6 +15,8 @@ import Favorites from "./pages/Favorites";
 import RequestDocument from "./pages/RequestDocument";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminStatistics from "./pages/admin/Statistics";
+import AdminDocumentRequests from "./pages/admin/DocumentRequests";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/request-document" element={<RequestDocument />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/statistics" element={<AdminStatistics />} />
+            <Route path="/admin/requests" element={<AdminDocumentRequests />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
