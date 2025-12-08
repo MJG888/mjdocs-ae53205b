@@ -178,24 +178,29 @@ export default function DocumentRequests() {
       <header className="bg-background border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0">
               <FileQuestion className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="font-display font-bold text-foreground">Document Requests</h1>
+            <div className="min-w-0">
+              <h1 className="font-display font-bold text-foreground truncate">Document Requests</h1>
               <p className="text-xs text-muted-foreground">Manage user requests</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 shrink-0">
             <Link to="/admin/dashboard">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                Dashboard
+                <span className="hidden sm:inline">Dashboard</span>
               </Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={handleLogout}
+              className="gap-2 bg-primary hover:bg-primary/90"
+            >
               <LogOut className="w-4 h-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
