@@ -3,10 +3,13 @@ import { Layout } from "@/components/layout/Layout";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
 import { SearchFilter } from "@/components/documents/SearchFilter";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { WelcomeHints } from "@/components/onboarding/WelcomeHints";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { FileText, Loader2, FolderOpen } from "lucide-react";
+import { FileText, Loader2, FolderOpen, Search, GraduationCap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface Document {
   id: string;
@@ -20,13 +23,22 @@ interface Document {
   tags: string[] | null;
   download_count: number;
   created_at: string;
+  semester: string | null;
+}
+
+interface Semester {
+  id: string;
+  name: string;
+  display_order: number;
 }
 
 export default function Documents() {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSemester, setSelectedSemester] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -35,6 +47,7 @@ export default function Documents() {
 
   useEffect(() => {
     fetchDocuments();
+    fetchSemesters();
   }, []);
 
   // Fetch user favorites
@@ -45,6 +58,17 @@ export default function Documents() {
       setFavorites(new Set());
     }
   }, [user]);
+
+  const fetchSemesters = async () => {
+    const { data } = await supabase
+      .from("semesters")
+      .select("*")
+      .order("display_order", { ascending: true });
+    
+    if (data) {
+      setSemesters(data);
+    }
+  };
 
   const fetchFavorites = async () => {
     if (!user) return;
@@ -109,6 +133,11 @@ export default function Documents() {
       filtered = filtered.filter((doc) => doc.category === selectedCategory);
     }
 
+    // Semester filter
+    if (selectedSemester !== "all") {
+      filtered = filtered.filter((doc) => doc.semester === selectedSemester);
+    }
+
     // Sort
     switch (sortBy) {
       case "oldest":
@@ -131,15 +160,24 @@ export default function Documents() {
     }
 
     return filtered;
-  }, [documents, searchQuery, selectedCategory, sortBy]);
+  }, [documents, searchQuery, selectedCategory, selectedSemester, sortBy]);
 
   const handleDownload = async (id: string) => {
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
 
     try {
-      // Increment download count via edge function (bypasses RLS)
-      const { data: result } = await supabase.functions.invoke("increment-download", {
+      // Get signed URL from edge function (prevents hotlinking)
+      const { data: result, error } = await supabase.functions.invoke("get-signed-url", {
+        body: { documentId: id },
+      });
+
+      if (error || result?.error) {
+        throw new Error(result?.error || error?.message || "Failed to get download link");
+      }
+
+      // Increment download count
+      await supabase.functions.invoke("increment-download", {
         body: { documentId: id },
       });
 
@@ -155,19 +193,13 @@ export default function Documents() {
       }
       localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(history));
 
-      // Get download URL
-      const { data } = supabase.storage
-        .from("documents")
-        .getPublicUrl(doc.file_path);
-
-      // Open download in new tab
-      window.open(data.publicUrl, "_blank");
+      // Open signed download URL
+      window.open(result.signedUrl, "_blank");
 
       // Update local state with new count
-      const newCount = result?.newCount || doc.download_count + 1;
       setDocuments((prev) =>
         prev.map((d) =>
-          d.id === id ? { ...d, download_count: newCount } : d
+          d.id === id ? { ...d, download_count: d.download_count + 1 } : d
         )
       );
 
@@ -179,7 +211,7 @@ export default function Documents() {
       console.error("Error downloading:", error);
       toast({
         title: "Download Failed",
-        description: "Please try again.",
+        description: error instanceof Error ? error.message : "Please try again.",
         variant: "destructive",
       });
     }
@@ -232,13 +264,50 @@ export default function Documents() {
     }
   };
 
-  const getFileUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("documents").getPublicUrl(filePath);
-    return data.publicUrl;
+  const getFileUrl = async (filePath: string, docId: string) => {
+    // Get signed URL for viewing
+    const { data } = await supabase.functions.invoke("get-signed-url", {
+      body: { documentId: docId },
+    });
+    return data?.signedUrl || "";
+  };
+
+  // For viewer, we need signed URL
+  const [viewerUrl, setViewerUrl] = useState("");
+  
+  useEffect(() => {
+    if (viewingDoc) {
+      getFileUrl(viewingDoc.file_path, viewingDoc.id).then(setViewerUrl);
+    } else {
+      setViewerUrl("");
+    }
+  }, [viewingDoc]);
+
+  // Empty state messages based on filters
+  const getEmptyStateMessage = () => {
+    if (searchQuery) {
+      return {
+        title: "No documents match your search",
+        description: "Try different keywords or clear the search to see all documents.",
+      };
+    }
+    if (selectedCategory !== "all" || selectedSemester !== "all") {
+      return {
+        title: "No documents in this section",
+        description: "Try changing the filters or browse all documents.",
+      };
+    }
+    return {
+      title: "No Documents Found",
+      description: "Documents will appear here once uploaded by an administrator.",
+    };
   };
 
   return (
     <Layout>
+      {/* Welcome hints for new users */}
+      <WelcomeHints />
+
       {/* Hero */}
       <section className="py-16 bg-gradient-to-b from-orange-50 to-background">
         <div className="container mx-auto px-4">
@@ -259,6 +328,37 @@ export default function Documents() {
         </div>
       </section>
 
+      {/* Semester Pills */}
+      {semesters.length > 0 && (
+        <section className="py-4 border-b border-border bg-background/50 backdrop-blur-sm sticky top-16 z-40">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+                <GraduationCap className="w-4 h-4" />
+                <span className="text-sm font-medium">Semester:</span>
+              </div>
+              <Badge
+                variant={selectedSemester === "all" ? "default" : "outline"}
+                className="cursor-pointer shrink-0"
+                onClick={() => setSelectedSemester("all")}
+              >
+                All
+              </Badge>
+              {semesters.map((sem) => (
+                <Badge
+                  key={sem.id}
+                  variant={selectedSemester === sem.name ? "default" : "outline"}
+                  className="cursor-pointer shrink-0"
+                  onClick={() => setSelectedSemester(sem.name)}
+                >
+                  {sem.name}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Documents List */}
       <section className="py-12">
         <div className="container mx-auto px-4">
@@ -278,21 +378,28 @@ export default function Documents() {
                 <Loader2 className="w-8 h-8 text-primary animate-spin" />
               </div>
             ) : filteredDocuments.length === 0 ? (
-              <div className="text-center py-20">
-                <FolderOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                  No Documents Found
-                </h3>
-                <p className="text-muted-foreground">
-                  {searchQuery || selectedCategory !== "all"
-                    ? "Try adjusting your search or filters."
-                    : "Documents will appear here once uploaded by an administrator."}
-                </p>
-              </div>
+              <EmptyState
+                icon={searchQuery ? Search : FolderOpen}
+                title={getEmptyStateMessage().title}
+                description={getEmptyStateMessage().description}
+                action={
+                  (searchQuery || selectedCategory !== "all" || selectedSemester !== "all")
+                    ? {
+                        label: "Clear Filters",
+                        onClick: () => {
+                          setSearchQuery("");
+                          setSelectedCategory("all");
+                          setSelectedSemester("all");
+                        },
+                      }
+                    : undefined
+                }
+              />
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Showing {filteredDocuments.length} document{filteredDocuments.length !== 1 ? "s" : ""}
+                  {selectedSemester !== "all" && ` in ${selectedSemester}`}
                 </p>
                 <div className="grid gap-4">
                   {filteredDocuments.map((doc) => (
@@ -322,12 +429,12 @@ export default function Documents() {
       </section>
 
       {/* Document Viewer Modal */}
-      {viewingDoc && (
+      {viewingDoc && viewerUrl && (
         <DocumentViewer
           isOpen={!!viewingDoc}
           onClose={() => setViewingDoc(null)}
           title={viewingDoc.title}
-          fileUrl={getFileUrl(viewingDoc.file_path)}
+          fileUrl={viewerUrl}
           fileType={viewingDoc.file_type || undefined}
           fileName={viewingDoc.file_name}
           onDownload={() => handleDownload(viewingDoc.id)}

@@ -32,6 +32,7 @@ export default function Downloads() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
+  const [viewerUrl, setViewerUrl] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -96,17 +97,21 @@ export default function Downloads() {
     if (!doc) return;
 
     try {
+      // Get signed URL from edge function
+      const { data: result, error } = await supabase.functions.invoke("get-signed-url", {
+        body: { documentId: id },
+      });
+
+      if (error || result?.error) {
+        throw new Error(result?.error || error?.message || "Failed to get download link");
+      }
+
       // Increment download count via edge function
       await supabase.functions.invoke("increment-download", {
         body: { documentId: id },
       });
 
-      // Get download URL
-      const { data } = supabase.storage
-        .from("documents")
-        .getPublicUrl(doc.file_path);
-
-      window.open(data.publicUrl, "_blank");
+      window.open(result.signedUrl, "_blank");
 
       toast({
         title: "Download Started",
@@ -116,21 +121,29 @@ export default function Downloads() {
       console.error("Error downloading:", error);
       toast({
         title: "Download Failed",
-        description: "Please try again.",
+        description: error instanceof Error ? error.message : "Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const handleView = (id: string) => {
+  const handleView = async (id: string) => {
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
-    setViewingDoc(doc);
-  };
-
-  const getFileUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("documents").getPublicUrl(filePath);
-    return data.publicUrl;
+    
+    try {
+      // Get signed URL for viewing
+      const { data: result } = await supabase.functions.invoke("get-signed-url", {
+        body: { documentId: id },
+      });
+      
+      if (result?.signedUrl) {
+        setViewerUrl(result.signedUrl);
+        setViewingDoc(doc);
+      }
+    } catch (error) {
+      console.error("Error getting view URL:", error);
+    }
   };
 
   const getDownloadDate = (id: string): string | undefined => {
@@ -231,12 +244,15 @@ export default function Downloads() {
       </section>
 
       {/* Document Viewer Modal */}
-      {viewingDoc && (
+      {viewingDoc && viewerUrl && (
         <DocumentViewer
           isOpen={!!viewingDoc}
-          onClose={() => setViewingDoc(null)}
+          onClose={() => {
+            setViewingDoc(null);
+            setViewerUrl("");
+          }}
           title={viewingDoc.title}
-          fileUrl={getFileUrl(viewingDoc.file_path)}
+          fileUrl={viewerUrl}
           fileType={viewingDoc.file_type || undefined}
           fileName={viewingDoc.file_name}
           onDownload={() => handleDownload(viewingDoc.id)}
