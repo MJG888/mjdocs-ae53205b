@@ -137,6 +137,7 @@ export type Database = {
           file_size: number
           file_type: string | null
           id: string
+          semester: string | null
           status: Database["public"]["Enums"]["document_status"]
           tags: string[] | null
           title: string
@@ -155,6 +156,7 @@ export type Database = {
           file_size?: number
           file_type?: string | null
           id?: string
+          semester?: string | null
           status?: Database["public"]["Enums"]["document_status"]
           tags?: string[] | null
           title: string
@@ -173,6 +175,7 @@ export type Database = {
           file_size?: number
           file_type?: string | null
           id?: string
+          semester?: string | null
           status?: Database["public"]["Enums"]["document_status"]
           tags?: string[] | null
           title?: string
@@ -202,6 +205,27 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      semesters: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
         }
         Relationships: []
       }

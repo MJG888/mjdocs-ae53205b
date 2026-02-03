@@ -26,6 +26,7 @@ export default function Favorites() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
+  const [viewerUrl, setViewerUrl] = useState("");
   
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -111,32 +112,58 @@ export default function Favorites() {
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
 
-    // Increment download count
-    await supabase.functions.invoke("increment-download", {
-      body: { documentId: id },
-    });
+    try {
+      // Get signed URL from edge function
+      const { data: result, error } = await supabase.functions.invoke("get-signed-url", {
+        body: { documentId: id },
+      });
 
-    // Track download in user_downloads
-    if (user) {
-      await supabase.from("user_downloads").insert({
-        user_id: user.id,
-        document_id: id,
+      if (error || result?.error) {
+        throw new Error(result?.error || error?.message || "Failed to get download link");
+      }
+
+      // Increment download count
+      await supabase.functions.invoke("increment-download", {
+        body: { documentId: id },
+      });
+
+      // Track download in user_downloads
+      if (user) {
+        await supabase.from("user_downloads").insert({
+          user_id: user.id,
+          document_id: id,
+        });
+      }
+
+      // Open signed URL in new tab
+      window.open(result.signedUrl, "_blank");
+    } catch (error) {
+      console.error("Error downloading:", error);
+      toast({
+        title: "Download Failed",
+        description: error instanceof Error ? error.message : "Please try again.",
+        variant: "destructive",
       });
     }
-
-    // Open file in new tab
-    const url = getFileUrl(doc.file_path);
-    window.open(url, "_blank");
   };
 
-  const handleView = (id: string) => {
+  const handleView = async (id: string) => {
     const doc = documents.find((d) => d.id === id);
-    if (doc) setViewingDoc(doc);
-  };
-
-  const getFileUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("documents").getPublicUrl(filePath);
-    return data.publicUrl;
+    if (!doc) return;
+    
+    try {
+      // Get signed URL for viewing
+      const { data: result } = await supabase.functions.invoke("get-signed-url", {
+        body: { documentId: id },
+      });
+      
+      if (result?.signedUrl) {
+        setViewerUrl(result.signedUrl);
+        setViewingDoc(doc);
+      }
+    } catch (error) {
+      console.error("Error getting view URL:", error);
+    }
   };
 
   if (authLoading) {
@@ -217,12 +244,15 @@ export default function Favorites() {
       </section>
 
       {/* Document Viewer Modal */}
-      {viewingDoc && (
+      {viewingDoc && viewerUrl && (
         <DocumentViewer
           isOpen={!!viewingDoc}
-          onClose={() => setViewingDoc(null)}
+          onClose={() => {
+            setViewingDoc(null);
+            setViewerUrl("");
+          }}
           title={viewingDoc.title}
-          fileUrl={getFileUrl(viewingDoc.file_path)}
+          fileUrl={viewerUrl}
           fileType={viewingDoc.file_type || undefined}
           fileName={viewingDoc.file_name}
           onDownload={() => handleDownload(viewingDoc.id)}

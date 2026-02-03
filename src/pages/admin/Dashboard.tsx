@@ -69,6 +69,13 @@ interface Document {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  semester: string | null;
+}
+
+interface Semester {
+  id: string;
+  name: string;
+  display_order: number;
 }
 
 function formatFileSize(bytes: number): string {
@@ -85,6 +92,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
 
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleted, setShowDeleted] = useState(false);
   
@@ -95,6 +103,7 @@ export default function AdminDashboard() {
   const [uploadDescription, setUploadDescription] = useState("");
   const [uploadCategory, setUploadCategory] = useState("");
   const [uploadTags, setUploadTags] = useState("");
+  const [uploadSemester, setUploadSemester] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   // Edit dialog state
@@ -103,6 +112,7 @@ export default function AdminDashboard() {
   const [editDescription, setEditDescription] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editTags, setEditTags] = useState("");
+  const [editSemester, setEditSemester] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -114,8 +124,20 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (user && isAdmin) {
       fetchDocuments();
+      fetchSemesters();
     }
   }, [user, isAdmin, showDeleted]);
+
+  const fetchSemesters = async () => {
+    const { data } = await supabase
+      .from("semesters")
+      .select("*")
+      .order("display_order", { ascending: true });
+    
+    if (data) {
+      setSemesters(data);
+    }
+  };
 
   const fetchDocuments = async () => {
     setIsLoading(true);
@@ -174,6 +196,7 @@ export default function AdminDashboard() {
         file_type: uploadFile.type,
         category: uploadCategory.trim() || null,
         tags: uploadTags.trim() ? uploadTags.split(",").map((t) => t.trim()) : null,
+        semester: uploadSemester || null,
         uploaded_by: user?.id,
       });
 
@@ -190,6 +213,7 @@ export default function AdminDashboard() {
       setUploadDescription("");
       setUploadCategory("");
       setUploadTags("");
+      setUploadSemester("");
       setIsUploadOpen(false);
       fetchDocuments();
     } catch (error) {
@@ -216,6 +240,7 @@ export default function AdminDashboard() {
           description: editDescription.trim() || null,
           category: editCategory.trim() || null,
           tags: editTags.trim() ? editTags.split(",").map((t) => t.trim()) : null,
+          semester: editSemester || null,
         })
         .eq("id", editDoc.id);
 
@@ -322,6 +347,7 @@ export default function AdminDashboard() {
     setEditDescription(doc.description || "");
     setEditCategory(doc.category || "");
     setEditTags(doc.tags?.join(", ") || "");
+    setEditSemester(doc.semester || "");
   };
 
   const handleLogout = async () => {
@@ -480,6 +506,21 @@ export default function AdminDashboard() {
                     rows={3}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>Semester</Label>
+                  <Select value={uploadSemester} onValueChange={setUploadSemester}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select semester" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {semesters.map((sem) => (
+                        <SelectItem key={sem.id} value={sem.name}>
+                          {sem.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Category</Label>
@@ -563,6 +604,7 @@ export default function AdminDashboard() {
                 <thead className="bg-muted/50 border-b border-border">
                   <tr>
                     <th className="text-left p-4 font-semibold text-foreground">Document</th>
+                    <th className="text-left p-4 font-semibold text-foreground">Semester</th>
                     <th className="text-left p-4 font-semibold text-foreground">Category</th>
                     <th className="text-left p-4 font-semibold text-foreground">Size</th>
                     <th className="text-left p-4 font-semibold text-foreground">Downloads</th>
@@ -584,6 +626,13 @@ export default function AdminDashboard() {
                             <p className="text-xs text-muted-foreground">{doc.file_name}</p>
                           </div>
                         </div>
+                      </td>
+                      <td className="p-4">
+                        {doc.semester ? (
+                          <Badge variant="outline">{doc.semester}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="p-4">
                         {doc.category ? (
@@ -711,6 +760,22 @@ export default function AdminDashboard() {
                 placeholder="Brief description"
                 rows={3}
               />
+            </div>
+            <div className="space-y-2">
+              <Label>Semester</Label>
+              <Select value={editSemester} onValueChange={setEditSemester}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No Semester</SelectItem>
+                  {semesters.map((sem) => (
+                    <SelectItem key={sem.id} value={sem.name}>
+                      {sem.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
