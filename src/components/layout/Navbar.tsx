@@ -4,6 +4,7 @@ import { Menu, X, FileText, LogIn, User, LogOut, Heart, FileQuestion, UserPlus }
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +67,7 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -129,17 +131,20 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              "md:hidden p-2.5 rounded-xl transition-all duration-300",
-              isOpen 
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
-                : "bg-muted hover:bg-muted/80"
-            )}
-          >
-            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={cn(
+                "p-2.5 rounded-xl transition-all duration-300",
+                isOpen 
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
+                  : "bg-muted hover:bg-muted/80"
+              )}
+            >
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
