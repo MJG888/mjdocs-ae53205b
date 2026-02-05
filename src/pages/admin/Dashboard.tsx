@@ -763,12 +763,12 @@ export default function AdminDashboard() {
             </div>
             <div className="space-y-2">
               <Label>Semester</Label>
-              <Select value={editSemester} onValueChange={setEditSemester}>
+              <Select value={editSemester || "none"} onValueChange={(value) => setEditSemester(value === "none" ? "" : value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select semester" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Semester</SelectItem>
+                  <SelectItem value="none">No Semester</SelectItem>
                   {semesters.map((sem) => (
                     <SelectItem key={sem.id} value={sem.name}>
                       {sem.name}
