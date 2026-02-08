@@ -34,6 +34,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
   FileText,
   Upload,
   Trash2,
@@ -49,6 +57,8 @@ import {
   History,
   BarChart3,
   FileQuestion,
+  MoreVertical,
+  Home,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -377,28 +387,40 @@ export default function AdminDashboard() {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/admin/statistics">
-              <Button variant="outline" size="sm" className="gap-2">
-                <BarChart3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Statistics</span>
-              </Button>
-            </Link>
-            <Link to="/admin/requests">
-              <Button variant="outline" size="sm" className="gap-2">
-                <FileQuestion className="w-4 h-4" />
-                <span className="hidden sm:inline">Requests</span>
-              </Button>
-            </Link>
-            <Button 
-              variant="default" 
-              size="sm" 
-              onClick={handleLogout}
-              className="gap-2 bg-primary hover:bg-primary/90"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/" className="flex items-center gap-2 cursor-pointer">
+                    <Home className="w-4 h-4" />
+                    Home
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/statistics" className="flex items-center gap-2 cursor-pointer">
+                    <BarChart3 className="w-4 h-4" />
+                    Statistics
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/requests" className="flex items-center gap-2 cursor-pointer">
+                    <FileQuestion className="w-4 h-4" />
+                    Document Requests
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
