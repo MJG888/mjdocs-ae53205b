@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, LogIn, User, LogOut, Heart, FileQuestion, UserPlus, Shield } from "lucide-react";
+import { Menu, X, LogIn, User, LogOut, Heart, FileQuestion, UserPlus, Shield, MoreVertical } from "lucide-react";
 import logoImg from "@/assets/MJDOCS.jpg";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <img src={logoImg} alt="MJDOCS Logo" className="w-11 h-11 rounded-xl shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 object-cover" />
+            <img src={logoImg} alt="MJDOCS Logo" className="w-9 h-9 rounded-lg shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 object-cover" />
             <span className="font-display text-2xl font-bold text-foreground tracking-tight">
               MJ<span className="text-gradient-orange">DOCS</span>
             </span>
@@ -106,25 +106,34 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <>
-                <Link to="/auth?mode=signup">
-                  <Button variant="hero" size="sm" className="rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-                    <UserPlus className="w-4 h-4" />
-                    Sign Up
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
+                    <MoreVertical className="w-4 h-4" />
                   </Button>
-                </Link>
-                <Link to="/auth">
-                  <Button variant="outline" size="sm" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
-                    <LogIn className="w-4 h-4" />
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/admin/login">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    Admin
-                  </Button>
-                </Link>
-              </>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg z-50">
+                  <DropdownMenuItem asChild>
+                    <Link to="/auth?mode=signup" className="flex items-center gap-2 cursor-pointer">
+                      <UserPlus className="w-4 h-4" />
+                      Sign Up
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/auth" className="flex items-center gap-2 cursor-pointer">
+                      <LogIn className="w-4 h-4" />
+                      Login
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin/login" className="flex items-center gap-2 cursor-pointer text-muted-foreground">
+                      <Shield className="w-4 h-4" />
+                      Admin
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 
