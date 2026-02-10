@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, FileText, LogIn, User, LogOut, Heart, FileQuestion, UserPlus } from "lucide-react";
+import { Menu, X, LogIn, User, LogOut, Heart, FileQuestion, UserPlus, Shield } from "lucide-react";
+import logoImg from "@/assets/MJDOCS.jpg";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,10 +39,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-xl group-hover:shadow-primary/30 group-hover:scale-105 transition-all duration-300">
-              <FileText className="w-5 h-5 text-primary-foreground" />
-              <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+            <img src={logoImg} alt="MJDOCS Logo" className="w-11 h-11 rounded-xl shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 object-cover" />
             <span className="font-display text-2xl font-bold text-foreground tracking-tight">
               MJ<span className="text-gradient-orange">DOCS</span>
             </span>
@@ -94,7 +92,7 @@ export function Navbar() {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard" className="flex items-center gap-2 cursor-pointer text-primary">
-                          <FileText className="w-4 h-4" />
+                          <Shield className="w-4 h-4" />
                           Admin Dashboard
                         </Link>
                       </DropdownMenuItem>
