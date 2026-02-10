@@ -39,7 +39,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <img src={logoImg} alt="MJDOCS Logo" className="w-9 h-9 rounded-lg shadow-md border-2 border-border group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 object-cover" />
+            <img src={logoImg} alt="MJDOCS Logo" className="w-9 h-9 rounded-lg shadow-md border-[3px] border-primary group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 object-cover" />
             <span className="font-display text-2xl font-bold text-foreground tracking-tight">
               MJ<span className="text-gradient-orange">DOCS</span>
             </span>
