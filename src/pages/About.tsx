@@ -39,7 +39,7 @@ export default function About() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="py-24 bg-gradient-to-b from-orange-50 to-background">
+      <section className="py-24 bg-gradient-to-b from-accent to-background">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
