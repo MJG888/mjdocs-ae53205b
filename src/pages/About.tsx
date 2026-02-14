@@ -46,7 +46,7 @@ export default function About() {
               About <span className="text-primary">MJDOCS</span>
             </h1>
             <p className="text-lg text-muted-foreground">
-              MJDOCS is a secure, admin-managed document storage platform designed to provide easy access to important documents while maintaining strict quality control.
+              MJDOCS is a secure, admin-managed document storage platform designed to provide easy access to important documents while maintaining strict quality control. <span className="font-semibold text-primary">ADMIN: Manoj</span>
             </p>
           </div>
         </div>
