@@ -56,7 +56,7 @@ export default function Index() {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground mb-8 animate-slide-up stagger-1">
-              MJDOCS is a secure document storage platform where you can browse, search, and download documents with ease. Admin-managed for quality control.
+              MJDOCS is a secure document storage platform where you can browse, search, and download documents with ease. Admin-managed for quality control. <span className="font-semibold text-primary">ADMIN: Manoj</span>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up stagger-2">
