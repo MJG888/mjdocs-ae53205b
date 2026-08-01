@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -80,6 +81,14 @@ interface Document {
   updated_at: string;
   deleted_at: string | null;
   semester: string | null;
+  doc_type: string | null;
+  subject_code: string | null;
+  exam_type: string | null;
+  exam_year: number | null;
+  long_description: string | null;
+  topics: string[] | null;
+  prep_tips: string | null;
+  is_featured: boolean | null;
 }
 
 interface Semester {
@@ -114,6 +123,8 @@ export default function AdminDashboard() {
   const [uploadCategory, setUploadCategory] = useState("");
   const [uploadTags, setUploadTags] = useState("");
   const [uploadSemester, setUploadSemester] = useState("");
+  const [uploadDocType, setUploadDocType] = useState("notes");
+  const [uploadSubjectCode, setUploadSubjectCode] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   // Edit dialog state
@@ -123,6 +134,14 @@ export default function AdminDashboard() {
   const [editCategory, setEditCategory] = useState("");
   const [editTags, setEditTags] = useState("");
   const [editSemester, setEditSemester] = useState("");
+  const [editDocType, setEditDocType] = useState("notes");
+  const [editSubjectCode, setEditSubjectCode] = useState("");
+  const [editExamType, setEditExamType] = useState("");
+  const [editExamYear, setEditExamYear] = useState("");
+  const [editLongDescription, setEditLongDescription] = useState("");
+  const [editTopics, setEditTopics] = useState("");
+  const [editPrepTips, setEditPrepTips] = useState("");
+  const [editFeatured, setEditFeatured] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -207,6 +226,8 @@ export default function AdminDashboard() {
         category: uploadCategory.trim() || null,
         tags: uploadTags.trim() ? uploadTags.split(",").map((t) => t.trim()) : null,
         semester: uploadSemester || null,
+        doc_type: uploadDocType,
+        subject_code: uploadSubjectCode.trim() || null,
         uploaded_by: user?.id,
       });
 
@@ -224,6 +245,8 @@ export default function AdminDashboard() {
       setUploadCategory("");
       setUploadTags("");
       setUploadSemester("");
+      setUploadDocType("notes");
+      setUploadSubjectCode("");
       setIsUploadOpen(false);
       fetchDocuments();
     } catch (error) {
@@ -251,6 +274,14 @@ export default function AdminDashboard() {
           category: editCategory.trim() || null,
           tags: editTags.trim() ? editTags.split(",").map((t) => t.trim()) : null,
           semester: editSemester || null,
+          doc_type: editDocType,
+          subject_code: editSubjectCode.trim() || null,
+          exam_type: editExamType.trim() || null,
+          exam_year: editExamYear.trim() ? Number(editExamYear) : null,
+          long_description: editLongDescription.trim() || null,
+          topics: editTopics.trim() ? editTopics.split(",").map((t) => t.trim()) : null,
+          prep_tips: editPrepTips.trim() || null,
+          is_featured: editFeatured,
         })
         .eq("id", editDoc.id);
 
@@ -358,6 +389,14 @@ export default function AdminDashboard() {
     setEditCategory(doc.category || "");
     setEditTags(doc.tags?.join(", ") || "");
     setEditSemester(doc.semester || "");
+    setEditDocType(doc.doc_type || "notes");
+    setEditSubjectCode(doc.subject_code || "");
+    setEditExamType(doc.exam_type || "");
+    setEditExamYear(doc.exam_year ? String(doc.exam_year) : "");
+    setEditLongDescription(doc.long_description || "");
+    setEditTopics(doc.topics?.join(", ") || "");
+    setEditPrepTips(doc.prep_tips || "");
+    setEditFeatured(!!doc.is_featured);
   };
 
   const handleLogout = async () => {
