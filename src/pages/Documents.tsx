@@ -246,9 +246,7 @@ export default function Documents() {
   };
 
   const handleView = (id: string) => {
-    const doc = documents.find((d) => d.id === id);
-    if (!doc) return;
-    setViewingDoc(doc);
+    navigate(`/documents/${id}`);
   };
 
   const handleToggleFavorite = async (id: string) => {
@@ -291,25 +289,6 @@ export default function Documents() {
       }
     }
   };
-
-  const getFileUrl = async (filePath: string, docId: string) => {
-    // Get signed URL for viewing
-    const { data } = await supabase.functions.invoke("get-signed-url", {
-      body: { documentId: docId },
-    });
-    return data?.signedUrl || "";
-  };
-
-  // For viewer, we need signed URL
-  const [viewerUrl, setViewerUrl] = useState("");
-  
-  useEffect(() => {
-    if (viewingDoc) {
-      getFileUrl(viewingDoc.file_path, viewingDoc.id).then(setViewerUrl);
-    } else {
-      setViewerUrl("");
-    }
-  }, [viewingDoc]);
 
   // Empty state messages based on filters
   const getEmptyStateMessage = () => {
