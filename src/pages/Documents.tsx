@@ -113,6 +113,28 @@ export default function Documents() {
     return [...new Set(cats)];
   }, [documents]);
 
+  // Auto-suggestion source: titles, categories and tags
+  const suggestionTerms = useMemo(() => {
+    const terms = documents.flatMap((doc) => [
+      doc.title,
+      ...(doc.category ? [doc.category] : []),
+      ...(doc.tags || []),
+    ]);
+    return [...new Set(terms.filter(Boolean))];
+  }, [documents]);
+
+  // Trending = subjects/categories from the most downloaded documents
+  const trendingTerms = useMemo(() => {
+    return [
+      ...new Set(
+        [...documents]
+          .sort((a, b) => b.download_count - a.download_count)
+          .map((doc) => doc.category || doc.title)
+          .filter(Boolean)
+      ),
+    ].slice(0, 6);
+  }, [documents]);
+
   // Filter and sort documents
   const filteredDocuments = useMemo(() => {
     let filtered = [...documents];
@@ -370,6 +392,8 @@ export default function Documents() {
             sortBy={sortBy}
             onSortChange={setSortBy}
             categories={categories}
+            suggestions={suggestionTerms}
+            trending={trendingTerms}
           />
 
           <div className="mt-8">
