@@ -47,6 +47,73 @@ export type Database = {
         }
         Relationships: []
       }
+      document_likes: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_likes_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          document_id: string
+          id: string
+          reason: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          document_id: string
+          id?: string
+          reason: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          document_id?: string
+          id?: string
+          reason?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_reports_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_requests: {
         Row: {
           admin_notes: string | null
@@ -131,18 +198,29 @@ export type Database = {
           current_version: number
           deleted_at: string | null
           description: string | null
+          doc_type: string
           download_count: number
+          exam_type: string | null
+          exam_year: number | null
           file_name: string
           file_path: string
           file_size: number
           file_type: string | null
+          helpful_count: number
           id: string
+          is_featured: boolean
+          long_description: string | null
+          page_count: number | null
+          prep_tips: string | null
           semester: string | null
           status: Database["public"]["Enums"]["document_status"]
+          subject_code: string | null
           tags: string[] | null
           title: string
+          topics: string[] | null
           updated_at: string
           uploaded_by: string | null
+          view_count: number
         }
         Insert: {
           category?: string | null
@@ -150,18 +228,29 @@ export type Database = {
           current_version?: number
           deleted_at?: string | null
           description?: string | null
+          doc_type?: string
           download_count?: number
+          exam_type?: string | null
+          exam_year?: number | null
           file_name: string
           file_path: string
           file_size?: number
           file_type?: string | null
+          helpful_count?: number
           id?: string
+          is_featured?: boolean
+          long_description?: string | null
+          page_count?: number | null
+          prep_tips?: string | null
           semester?: string | null
           status?: Database["public"]["Enums"]["document_status"]
+          subject_code?: string | null
           tags?: string[] | null
           title: string
+          topics?: string[] | null
           updated_at?: string
           uploaded_by?: string | null
+          view_count?: number
         }
         Update: {
           category?: string | null
@@ -169,18 +258,29 @@ export type Database = {
           current_version?: number
           deleted_at?: string | null
           description?: string | null
+          doc_type?: string
           download_count?: number
+          exam_type?: string | null
+          exam_year?: number | null
           file_name?: string
           file_path?: string
           file_size?: number
           file_type?: string | null
+          helpful_count?: number
           id?: string
+          is_featured?: boolean
+          long_description?: string | null
+          page_count?: number | null
+          prep_tips?: string | null
           semester?: string | null
           status?: Database["public"]["Enums"]["document_status"]
+          subject_code?: string | null
           tags?: string[] | null
           title?: string
+          topics?: string[] | null
           updated_at?: string
           uploaded_by?: string | null
+          view_count?: number
         }
         Relationships: []
       }
@@ -205,6 +305,27 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      search_queries: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          results_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          results_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          results_count?: number
         }
         Relationships: []
       }
@@ -319,6 +440,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_document_view: {
+        Args: { _document_id: string }
+        Returns: undefined
       }
     }
     Enums: {
