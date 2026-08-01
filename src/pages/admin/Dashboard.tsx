@@ -584,6 +584,28 @@ export default function AdminDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select value={uploadDocType} onValueChange={setUploadDocType}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="notes">Notes</SelectItem>
+                        <SelectItem value="paper">Question Paper</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subject Code</Label>
+                    <Input
+                      value={uploadSubjectCode}
+                      onChange={(e) => setUploadSubjectCode(e.target.value)}
+                      placeholder="e.g., BCS301"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label>Category</Label>
                     <Input
                       value={uploadCategory}
