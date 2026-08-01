@@ -60,6 +60,21 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Terms &amp; Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/dmca" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  DMCA Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/disclaimer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Disclaimer
+                </Link>
+              </li>
+              <li>
                 <a 
                   href="mailto:mjdocs777@gmail.com" 
                   className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"

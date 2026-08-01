@@ -11,6 +11,9 @@ import Documents from "./pages/Documents";
 import Downloads from "./pages/Downloads";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import DMCA from "./pages/DMCA";
+import Disclaimer from "./pages/Disclaimer";
 import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
 import RequestDocument from "./pages/RequestDocument";
@@ -37,6 +40,9 @@ const App = () => (
               <Route path="/downloads" element={<Downloads />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/dmca" element={<DMCA />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/request-document" element={<RequestDocument />} />
