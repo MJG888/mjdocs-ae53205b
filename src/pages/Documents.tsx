@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { DocumentCard } from "@/components/documents/DocumentCard";
-import { DocumentViewer } from "@/components/documents/DocumentViewer";
 import { SearchFilter } from "@/components/documents/SearchFilter";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { WelcomeHints } from "@/components/onboarding/WelcomeHints";
@@ -24,6 +26,8 @@ interface Document {
   download_count: number;
   created_at: string;
   semester: string | null;
+  subject_code: string | null;
+  doc_type: string;
 }
 
 interface Semester {
@@ -33,10 +37,12 @@ interface Semester {
 }
 
 export default function Documents() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
@@ -184,6 +190,22 @@ export default function Documents() {
     return filtered;
   }, [documents, searchQuery, selectedCategory, selectedSemester, sortBy]);
 
+  // Keep the search term in the URL (shareable) and log it for search analytics
+  useEffect(() => {
+    const term = searchQuery.trim();
+    const timer = setTimeout(() => {
+      setSearchParams(term ? { q: term } : {}, { replace: true });
+      if (term.length >= 3) {
+        supabase
+          .from("search_queries")
+          .insert({ query: term.toLowerCase(), results_count: filteredDocuments.length })
+          .then(() => undefined);
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
   const handleDownload = async (id: string) => {
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
@@ -240,9 +262,7 @@ export default function Documents() {
   };
 
   const handleView = (id: string) => {
-    const doc = documents.find((d) => d.id === id);
-    if (!doc) return;
-    setViewingDoc(doc);
+    navigate(`/documents/${id}`);
   };
 
   const handleToggleFavorite = async (id: string) => {
@@ -286,25 +306,6 @@ export default function Documents() {
     }
   };
 
-  const getFileUrl = async (filePath: string, docId: string) => {
-    // Get signed URL for viewing
-    const { data } = await supabase.functions.invoke("get-signed-url", {
-      body: { documentId: docId },
-    });
-    return data?.signedUrl || "";
-  };
-
-  // For viewer, we need signed URL
-  const [viewerUrl, setViewerUrl] = useState("");
-  
-  useEffect(() => {
-    if (viewingDoc) {
-      getFileUrl(viewingDoc.file_path, viewingDoc.id).then(setViewerUrl);
-    } else {
-      setViewerUrl("");
-    }
-  }, [viewingDoc]);
-
   // Empty state messages based on filters
   const getEmptyStateMessage = () => {
     if (searchQuery) {
@@ -327,6 +328,17 @@ export default function Documents() {
 
   return (
     <Layout>
+      <Seo
+        title="Browse Notes & Question Papers | MJDOCS"
+        description="Search semester-wise engineering notes and previous year question papers. Filter by subject, subject code, or semester and download free PDFs."
+        path="/documents"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Documents", path: "/documents" },
+        ])}
+      />
+      <AdSlot format="header" className="container mx-auto px-4 pt-4" />
+
       {/* Welcome hints for new users */}
       <WelcomeHints />
 
@@ -452,18 +464,6 @@ export default function Documents() {
         </div>
       </section>
 
-      {/* Document Viewer Modal */}
-      {viewingDoc && viewerUrl && (
-        <DocumentViewer
-          isOpen={!!viewingDoc}
-          onClose={() => setViewingDoc(null)}
-          title={viewingDoc.title}
-          fileUrl={viewerUrl}
-          fileType={viewingDoc.file_type || undefined}
-          fileName={viewingDoc.file_name}
-          onDownload={() => handleDownload(viewingDoc.id)}
-        />
-      )}
     </Layout>
   );
 }

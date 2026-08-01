@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -80,6 +81,14 @@ interface Document {
   updated_at: string;
   deleted_at: string | null;
   semester: string | null;
+  doc_type: string | null;
+  subject_code: string | null;
+  exam_type: string | null;
+  exam_year: number | null;
+  long_description: string | null;
+  topics: string[] | null;
+  prep_tips: string | null;
+  is_featured: boolean | null;
 }
 
 interface Semester {
@@ -114,6 +123,8 @@ export default function AdminDashboard() {
   const [uploadCategory, setUploadCategory] = useState("");
   const [uploadTags, setUploadTags] = useState("");
   const [uploadSemester, setUploadSemester] = useState("");
+  const [uploadDocType, setUploadDocType] = useState("notes");
+  const [uploadSubjectCode, setUploadSubjectCode] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   // Edit dialog state
@@ -123,6 +134,14 @@ export default function AdminDashboard() {
   const [editCategory, setEditCategory] = useState("");
   const [editTags, setEditTags] = useState("");
   const [editSemester, setEditSemester] = useState("");
+  const [editDocType, setEditDocType] = useState("notes");
+  const [editSubjectCode, setEditSubjectCode] = useState("");
+  const [editExamType, setEditExamType] = useState("");
+  const [editExamYear, setEditExamYear] = useState("");
+  const [editLongDescription, setEditLongDescription] = useState("");
+  const [editTopics, setEditTopics] = useState("");
+  const [editPrepTips, setEditPrepTips] = useState("");
+  const [editFeatured, setEditFeatured] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -207,6 +226,8 @@ export default function AdminDashboard() {
         category: uploadCategory.trim() || null,
         tags: uploadTags.trim() ? uploadTags.split(",").map((t) => t.trim()) : null,
         semester: uploadSemester || null,
+        doc_type: uploadDocType,
+        subject_code: uploadSubjectCode.trim() || null,
         uploaded_by: user?.id,
       });
 
@@ -224,6 +245,8 @@ export default function AdminDashboard() {
       setUploadCategory("");
       setUploadTags("");
       setUploadSemester("");
+      setUploadDocType("notes");
+      setUploadSubjectCode("");
       setIsUploadOpen(false);
       fetchDocuments();
     } catch (error) {
@@ -251,6 +274,14 @@ export default function AdminDashboard() {
           category: editCategory.trim() || null,
           tags: editTags.trim() ? editTags.split(",").map((t) => t.trim()) : null,
           semester: editSemester || null,
+          doc_type: editDocType,
+          subject_code: editSubjectCode.trim() || null,
+          exam_type: editExamType.trim() || null,
+          exam_year: editExamYear.trim() ? Number(editExamYear) : null,
+          long_description: editLongDescription.trim() || null,
+          topics: editTopics.trim() ? editTopics.split(",").map((t) => t.trim()) : null,
+          prep_tips: editPrepTips.trim() || null,
+          is_featured: editFeatured,
         })
         .eq("id", editDoc.id);
 
@@ -358,6 +389,14 @@ export default function AdminDashboard() {
     setEditCategory(doc.category || "");
     setEditTags(doc.tags?.join(", ") || "");
     setEditSemester(doc.semester || "");
+    setEditDocType(doc.doc_type || "notes");
+    setEditSubjectCode(doc.subject_code || "");
+    setEditExamType(doc.exam_type || "");
+    setEditExamYear(doc.exam_year ? String(doc.exam_year) : "");
+    setEditLongDescription(doc.long_description || "");
+    setEditTopics(doc.topics?.join(", ") || "");
+    setEditPrepTips(doc.prep_tips || "");
+    setEditFeatured(!!doc.is_featured);
   };
 
   const handleLogout = async () => {
@@ -542,6 +581,28 @@ export default function AdminDashboard() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select value={uploadDocType} onValueChange={setUploadDocType}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="notes">Notes</SelectItem>
+                        <SelectItem value="paper">Question Paper</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subject Code</Label>
+                    <Input
+                      value={uploadSubjectCode}
+                      onChange={(e) => setUploadSubjectCode(e.target.value)}
+                      placeholder="e.g., BCS301"
+                    />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -758,7 +819,7 @@ export default function AdminDashboard() {
 
       {/* Edit Dialog */}
       <Dialog open={!!editDoc} onOpenChange={() => setEditDoc(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Document</DialogTitle>
             <DialogDescription>
@@ -816,6 +877,86 @@ export default function AdminDashboard() {
                   placeholder="tag1, tag2"
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select value={editDocType} onValueChange={setEditDocType}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="notes">Notes</SelectItem>
+                    <SelectItem value="paper">Question Paper</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Subject Code</Label>
+                <Input
+                  value={editSubjectCode}
+                  onChange={(e) => setEditSubjectCode(e.target.value)}
+                  placeholder="e.g., BCS301"
+                />
+              </div>
+            </div>
+            {editDocType === "paper" && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Exam Type</Label>
+                  <Input
+                    value={editExamType}
+                    onChange={(e) => setEditExamType(e.target.value)}
+                    placeholder="e.g., End Semester"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Exam Year</Label>
+                  <Input
+                    type="number"
+                    value={editExamYear}
+                    onChange={(e) => setEditExamYear(e.target.value)}
+                    placeholder="e.g., 2024"
+                  />
+                </div>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Topics Covered (comma separated)</Label>
+              <Input
+                value={editTopics}
+                onChange={(e) => setEditTopics(e.target.value)}
+                placeholder="Trees, Graphs, Sorting"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Detailed Description (300–500 words, shown on the document page)</Label>
+              <Textarea
+                value={editLongDescription}
+                onChange={(e) => setEditLongDescription(e.target.value)}
+                placeholder="Write an original, detailed overview of this material..."
+                rows={8}
+              />
+              <p className="text-xs text-muted-foreground">
+                {editLongDescription.trim() ? editLongDescription.trim().split(/\s+/).length : 0} words
+                — leave blank to use the auto-generated description.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Preparation Tips</Label>
+              <Textarea
+                value={editPrepTips}
+                onChange={(e) => setEditPrepTips(e.target.value)}
+                placeholder="How students should use this material to prepare"
+                rows={4}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div>
+                <Label>Featured on homepage</Label>
+                <p className="text-xs text-muted-foreground">Show this document in the Featured section.</p>
+              </div>
+              <Switch checked={editFeatured} onCheckedChange={setEditFeatured} />
             </div>
             <Button onClick={handleEdit} disabled={isEditing} className="w-full">
               {isEditing ? (
