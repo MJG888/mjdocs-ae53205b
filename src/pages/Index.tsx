@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
+import { HomeSections } from "@/components/home/HomeSections";
 import { FileText, Search, Download, Shield, Zap, Users } from "lucide-react";
 
 const features = [
@@ -35,6 +37,25 @@ const stats = [
 export default function Index() {
   return (
     <Layout>
+      <Seo
+        title="MJDOCS — Free Engineering Notes & Question Papers"
+        description="Download free semester-wise engineering notes and previous year question papers as PDFs. Preview online, search by subject name or code, no signup needed."
+        path="/"
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "MJDOCS",
+            url: "https://mjdocs007.lovable.app",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: "https://mjdocs007.lovable.app/documents?q={search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
+          },
+          breadcrumbJsonLd([{ name: "Home", path: "/" }]),
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-accent via-background to-accent/50" />
@@ -89,6 +110,8 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      <HomeSections />
 
       {/* Features Section */}
       <section className="py-24 bg-muted/30">
