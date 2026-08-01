@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { DocumentCard } from "@/components/documents/DocumentCard";
-import { DocumentViewer } from "@/components/documents/DocumentViewer";
 import { SearchFilter } from "@/components/documents/SearchFilter";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { WelcomeHints } from "@/components/onboarding/WelcomeHints";
@@ -24,6 +26,8 @@ interface Document {
   download_count: number;
   created_at: string;
   semester: string | null;
+  subject_code: string | null;
+  doc_type: string;
 }
 
 interface Semester {
@@ -33,10 +37,12 @@ interface Semester {
 }
 
 export default function Documents() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
