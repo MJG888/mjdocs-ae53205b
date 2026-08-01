@@ -190,8 +190,23 @@ export default function Documents() {
     return filtered;
   }, [documents, searchQuery, selectedCategory, selectedSemester, sortBy]);
 
+  // Keep the search term in the URL (shareable) and log it for search analytics
+  useEffect(() => {
+    const term = searchQuery.trim();
+    const timer = setTimeout(() => {
+      setSearchParams(term ? { q: term } : {}, { replace: true });
+      if (term.length >= 3) {
+        supabase
+          .from("search_queries")
+          .insert({ query: term.toLowerCase(), results_count: filteredDocuments.length })
+          .then(() => undefined);
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
   const handleDownload = async (id: string) => {
-    // keep the search term shareable and logged for search analytics
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
 
