@@ -312,6 +312,17 @@ export default function Documents() {
 
   return (
     <Layout>
+      <Seo
+        title="Browse Notes & Question Papers | MJDOCS"
+        description="Search semester-wise engineering notes and previous year question papers. Filter by subject, subject code, or semester and download free PDFs."
+        path="/documents"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Documents", path: "/documents" },
+        ])}
+      />
+      <AdSlot format="header" className="container mx-auto px-4 pt-4" />
+
       {/* Welcome hints for new users */}
       <WelcomeHints />
 
@@ -437,18 +448,6 @@ export default function Documents() {
         </div>
       </section>
 
-      {/* Document Viewer Modal */}
-      {viewingDoc && viewerUrl && (
-        <DocumentViewer
-          isOpen={!!viewingDoc}
-          onClose={() => setViewingDoc(null)}
-          title={viewingDoc.title}
-          fileUrl={viewerUrl}
-          fileType={viewingDoc.file_type || undefined}
-          fileName={viewingDoc.file_name}
-          onDownload={() => handleDownload(viewingDoc.id)}
-        />
-      )}
     </Layout>
   );
 }
