@@ -819,7 +819,7 @@ export default function AdminDashboard() {
 
       {/* Edit Dialog */}
       <Dialog open={!!editDoc} onOpenChange={() => setEditDoc(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Document</DialogTitle>
             <DialogDescription>
@@ -877,6 +877,86 @@ export default function AdminDashboard() {
                   placeholder="tag1, tag2"
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select value={editDocType} onValueChange={setEditDocType}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="notes">Notes</SelectItem>
+                    <SelectItem value="paper">Question Paper</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Subject Code</Label>
+                <Input
+                  value={editSubjectCode}
+                  onChange={(e) => setEditSubjectCode(e.target.value)}
+                  placeholder="e.g., BCS301"
+                />
+              </div>
+            </div>
+            {editDocType === "paper" && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Exam Type</Label>
+                  <Input
+                    value={editExamType}
+                    onChange={(e) => setEditExamType(e.target.value)}
+                    placeholder="e.g., End Semester"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Exam Year</Label>
+                  <Input
+                    type="number"
+                    value={editExamYear}
+                    onChange={(e) => setEditExamYear(e.target.value)}
+                    placeholder="e.g., 2024"
+                  />
+                </div>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Topics Covered (comma separated)</Label>
+              <Input
+                value={editTopics}
+                onChange={(e) => setEditTopics(e.target.value)}
+                placeholder="Trees, Graphs, Sorting"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Detailed Description (300–500 words, shown on the document page)</Label>
+              <Textarea
+                value={editLongDescription}
+                onChange={(e) => setEditLongDescription(e.target.value)}
+                placeholder="Write an original, detailed overview of this material..."
+                rows={8}
+              />
+              <p className="text-xs text-muted-foreground">
+                {editLongDescription.trim() ? editLongDescription.trim().split(/\s+/).length : 0} words
+                — leave blank to use the auto-generated description.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Preparation Tips</Label>
+              <Textarea
+                value={editPrepTips}
+                onChange={(e) => setEditPrepTips(e.target.value)}
+                placeholder="How students should use this material to prepare"
+                rows={4}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div>
+                <Label>Featured on homepage</Label>
+                <p className="text-xs text-muted-foreground">Show this document in the Featured section.</p>
+              </div>
+              <Switch checked={editFeatured} onCheckedChange={setEditFeatured} />
             </div>
             <Button onClick={handleEdit} disabled={isEditing} className="w-full">
               {isEditing ? (
