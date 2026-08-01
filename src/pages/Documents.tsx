@@ -191,6 +191,7 @@ export default function Documents() {
   }, [documents, searchQuery, selectedCategory, selectedSemester, sortBy]);
 
   const handleDownload = async (id: string) => {
+    // keep the search term shareable and logged for search analytics
     const doc = documents.find((d) => d.id === id);
     if (!doc) return;
 
