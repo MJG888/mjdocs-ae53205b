@@ -126,6 +126,7 @@ export function DocumentCard({
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={() => onRemoveFavorite(id)}
               title="Remove from favorites"
+              aria-label={`Remove ${title} from favorites`}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -136,6 +137,7 @@ export function DocumentCard({
               className={isFavorite ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-red-500"}
               onClick={() => onToggleFavorite(id)}
               title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              aria-label={isFavorite ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
             >
               <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
             </Button>
@@ -143,20 +145,20 @@ export function DocumentCard({
           
           {viewPrimary ? (
             <>
-              <Button size="sm" onClick={() => onView(id)}>
+              <Button size="sm" onClick={() => onView(id)} aria-label={`View ${title}`}>
                 <Eye className="w-4 h-4" />
                 View
               </Button>
-              <Button size="sm" variant="outline" onClick={() => onDownload(id)}>
+              <Button size="sm" variant="outline" onClick={() => onDownload(id)} aria-label={`Download ${title}`}>
                 <Download className="w-4 h-4" />
               </Button>
             </>
           ) : (
             <>
-              <Button size="sm" onClick={() => onDownload(id)}>
+              <Button size="sm" onClick={() => onDownload(id)} aria-label={`Download ${title}`}>
                 <Download className="w-4 h-4" />
               </Button>
-              <Button size="sm" variant="outline" onClick={() => onView(id)}>
+              <Button size="sm" variant="outline" onClick={() => onView(id)} aria-label={`View ${title}`}>
                 <Eye className="w-4 h-4" />
               </Button>
             </>

@@ -53,6 +53,15 @@ export default function Index() {
               "query-input": "required name=search_term_string",
             },
           },
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "MJDOCS",
+            url: "https://mjdocs007.lovable.app",
+            logo: "https://mjdocs007.lovable.app/favicon.jpg",
+            description:
+              "MJDOCS publishes free semester-wise engineering notes and previous year question papers for students.",
+          },
           breadcrumbJsonLd([{ name: "Home", path: "/" }]),
         ]}
       />
@@ -89,7 +98,7 @@ export default function Index() {
               </Link>
               <Link to="/about">
                 <Button variant="hero-outline" size="xl">
-                  Learn More
+                  Learn about MJDOCS
                 </Button>
               </Link>
             </div>
