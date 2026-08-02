@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
 import { Shield, FileText, Users, Clock, CheckCircle } from "lucide-react";
 
 const values = [
@@ -38,6 +39,15 @@ const features = [
 export default function About() {
   return (
     <Layout>
+      <Seo
+        title="About MJDOCS — Free Engineering Notes Library"
+        description="Learn how MJDOCS curates free, admin-verified engineering notes and previous year question papers for students across all eight semesters."
+        path="/about"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "About", path: "/about" },
+        ])}
+      />
       {/* Hero */}
       <section className="py-24 bg-gradient-to-b from-accent to-background">
         <div className="container mx-auto px-4">

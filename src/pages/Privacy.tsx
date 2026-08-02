@@ -1,8 +1,18 @@
 import { Layout } from "@/components/layout/Layout";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
 
 export default function Privacy() {
   return (
     <Layout>
+      <Seo
+        title="Privacy Policy — MJDOCS"
+        description="Read how MJDOCS collects, stores and protects the limited personal information of students who browse and download engineering study materials."
+        path="/privacy"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Privacy Policy", path: "/privacy" },
+        ])}
+      />
       <section className="py-16 bg-gradient-to-b from-orange-50 to-background">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
