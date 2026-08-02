@@ -3,28 +3,40 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react";
+import { Loader2 } from "lucide-react";
  import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
-import About from "./pages/About";
-import Documents from "./pages/Documents";
-import DocumentDetail from "./pages/DocumentDetail";
-import Downloads from "./pages/Downloads";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import DMCA from "./pages/DMCA";
-import Disclaimer from "./pages/Disclaimer";
-import Auth from "./pages/Auth";
-import Favorites from "./pages/Favorites";
-import RequestDocument from "./pages/RequestDocument";
-import AdminLogin from "./pages/admin/Login";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminStatistics from "./pages/admin/Statistics";
-import AdminDocumentRequests from "./pages/admin/DocumentRequests";
-import NotFound from "./pages/NotFound";
+const About = lazy(() => import("./pages/About"));
+const Documents = lazy(() => import("./pages/Documents"));
+const DocumentDetail = lazy(() => import("./pages/DocumentDetail"));
+const Downloads = lazy(() => import("./pages/Downloads"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const DMCA = lazy(() => import("./pages/DMCA"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Favorites = lazy(() => import("./pages/Favorites"));
+const RequestDocument = lazy(() => import("./pages/RequestDocument"));
+const AdminLogin = lazy(() => import("./pages/admin/Login"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminStatistics = lazy(() => import("./pages/admin/Statistics"));
+const AdminDocumentRequests = lazy(() => import("./pages/admin/DocumentRequests"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 5 * 60 * 1000, gcTime: 30 * 60 * 1000, refetchOnWindowFocus: false, retry: 1 },
+  },
+});
+
+const RouteFallback = () => (
+  <div className="flex items-center justify-center py-32">
+    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -34,6 +46,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
@@ -54,6 +67,7 @@ const App = () => (
               <Route path="/admin/requests" element={<AdminDocumentRequests />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
