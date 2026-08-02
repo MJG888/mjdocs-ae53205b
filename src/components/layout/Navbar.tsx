@@ -39,7 +39,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <img src={logoImg} alt="MJDOCS Logo" className="w-9 h-9 rounded-lg shadow-md border-[3px] border-primary group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 object-cover" />
+            <img src={logoImg} alt="MJDOCS engineering notes library logo" className="w-9 h-9 rounded-lg shadow-md border-[3px] border-primary group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 object-cover" />
             <span className="font-display text-2xl font-bold text-foreground tracking-tight">
               MJ<span className="text-gradient-orange">DOCS</span>
             </span>
@@ -108,7 +108,7 @@ export function Navbar() {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
+                  <Button variant="outline" size="icon" aria-label="Open account menu" className="rounded-full border-2 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300">
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -142,6 +142,8 @@ export function Navbar() {
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isOpen}
               className={cn(
                 "p-2.5 rounded-xl transition-all duration-300",
                 isOpen 

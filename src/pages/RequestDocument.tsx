@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -136,6 +137,15 @@ export default function RequestDocument() {
 
   return (
     <Layout>
+      <Seo
+        title="Request Study Material — MJDOCS"
+        description="Can't find the notes or question paper you need? Request specific engineering study material and track the status of your requests on MJDOCS."
+        path="/request-document"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Request Document", path: "/request-document" },
+        ])}
+      />
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-orange-50 via-background to-orange-100/30 py-16">
         <div className="container mx-auto px-4">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
+import { Seo, breadcrumbJsonLd } from "@/components/seo/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,6 +78,15 @@ export default function Contact() {
   if (isSuccess) {
     return (
       <Layout>
+        <Seo
+          title="Contact MJDOCS — Get in Touch"
+          description="Contact the MJDOCS team about missing notes, question paper requests, corrections or takedown queries. We reply to student messages within a few days."
+          path="/contact"
+          jsonLd={breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ])}
+        />
         <section className="py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-md mx-auto text-center">
@@ -102,6 +112,15 @@ export default function Contact() {
 
   return (
     <Layout>
+      <Seo
+        title="Contact MJDOCS — Get in Touch"
+        description="Contact the MJDOCS team about missing notes, question paper requests, corrections or takedown queries. We reply to student messages within a few days."
+        path="/contact"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" },
+        ])}
+      />
       {/* Hero */}
       <section className="py-16 bg-gradient-to-b from-orange-50 to-background">
         <div className="container mx-auto px-4">
