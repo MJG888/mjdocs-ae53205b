@@ -140,10 +140,10 @@ export default function RequestDocument() {
       <Seo
         title="Request Study Material — MJDOCS"
         description="Can't find the notes or question paper you need? Request specific engineering study material and track the status of your requests on MJDOCS."
-        path="/request"
+        path="/request-document"
         jsonLd={breadcrumbJsonLd([
           { name: "Home", path: "/" },
-          { name: "Request Document", path: "/request" },
+          { name: "Request Document", path: "/request-document" },
         ])}
       />
       {/* Hero Section */}
