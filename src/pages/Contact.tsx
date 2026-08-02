@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
 const contactSchema = z.object({
-  _unused: z.undefined().optional(),
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
   email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
   subject: z.string().trim().min(1, "Subject is required").max(200, "Subject must be less than 200 characters"),
@@ -79,6 +78,15 @@ export default function Contact() {
   if (isSuccess) {
     return (
       <Layout>
+        <Seo
+          title="Contact MJDOCS — Get in Touch"
+          description="Contact the MJDOCS team about missing notes, question paper requests, corrections or takedown queries. We reply to student messages within a few days."
+          path="/contact"
+          jsonLd={breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ])}
+        />
         <section className="py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-md mx-auto text-center">
