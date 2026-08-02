@@ -137,6 +137,15 @@ export default function RequestDocument() {
 
   return (
     <Layout>
+      <Seo
+        title="Request Study Material — MJDOCS"
+        description="Can't find the notes or question paper you need? Request specific engineering study material and track the status of your requests on MJDOCS."
+        path="/request"
+        jsonLd={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Request Document", path: "/request" },
+        ])}
+      />
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-orange-50 via-background to-orange-100/30 py-16">
         <div className="container mx-auto px-4">
